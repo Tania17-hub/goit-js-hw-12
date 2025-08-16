@@ -21,18 +21,14 @@ export default defineConfig(({ command }) => {
               return 'vendor';
             }
           },
-          entryFileNames: chunkInfo => {
-            if (chunkInfo.name === 'commonHelpers') {
-              return 'commonHelpers.js';
-            }
-            return '[name].js';
-          },
-          assetFileNames: assetInfo => {
-            if (assetInfo.name && assetInfo.name.endsWith('.html')) {
-              return '[name].[ext]';
-            }
-            return 'assets/[name]-[hash][extname]';
-          },
+          entryFileNames: chunkInfo =>
+            chunkInfo.name === 'commonHelpers'
+              ? 'commonHelpers.js'
+              : '[name].js',
+          assetFileNames: assetInfo =>
+            assetInfo.name && assetInfo.name.endsWith('.html')
+              ? '[name].[ext]'
+              : 'assets/[name]-[hash][extname]',
         },
       },
       outDir: '../dist',
@@ -40,7 +36,7 @@ export default defineConfig(({ command }) => {
     },
     plugins: [
       injectHTML(),
-      FullReload(['./src/**/**.html']),
+      FullReload(['./src/**/*.html']),
       SortCss({
         sort: 'mobile-first',
       }),
