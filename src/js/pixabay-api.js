@@ -1,10 +1,9 @@
-import axios from 'axios';
-
 const API_KEY = '51816221-83730e1f7ca70b5540230754c';
 const BASE_URL = 'https://pixabay.com/api/';
 const PER_PAGE = 15;
 
 export async function getImagesByQuery(query, page = 1) {
+  // Используем глобальный axios из CDN
   const response = await axios.get(BASE_URL, {
     params: {
       key: API_KEY,

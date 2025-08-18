@@ -1,59 +1,53 @@
+// Файл для рендерингу галереї та управління кнопками/лоадером
+
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
-const gallery = document.querySelector('.gallery');
-const loaderWrapper = document.querySelector('.loader-wrapper');
-const loadMoreBtn = document.querySelector('.load-more');
-
-let lightbox = new SimpleLightbox('.gallery a');
+const galleryContainer = document.querySelector('.gallery');
+let lightbox = null;
 
 export function createGallery(images) {
   const markup = images
     .map(
-      ({
-        webformatURL,
-        largeImageURL,
-        tags,
-        likes,
-        views,
-        comments,
-        downloads,
-      }) => `
-      <li class="gallery-item">
-        <a class="gallery-link" href="${largeImageURL}">
-          <img class="gallery-image" src="${webformatURL}" alt="${tags}" loading="lazy" />
-        </a>
-        <div class="info-box">
-          <p><b>Likes</b><br>${likes}</p>
-          <p><b>Views</b><br>${views}</p>
-          <p><b>Comments</b><br>${comments}</p>
-          <p><b>Downloads</b><br>${downloads}</p>
-        </div>
-      </li>
+      ({ webformatURL, largeImageURL, tags }) => `
+      <a class="gallery__item" href="${largeImageURL}">
+        <img src="${webformatURL}" alt="${tags}" loading="lazy" />
+      </a>
     `
     )
     .join('');
+  galleryContainer.insertAdjacentHTML('beforeend', markup);
 
-  gallery.insertAdjacentHTML('beforeend', markup);
-  lightbox.refresh();
+  if (lightbox) {
+    lightbox.refresh();
+  } else {
+    lightbox = new SimpleLightbox('.gallery a', {
+      captionsData: 'alt',
+      captionDelay: 250,
+    });
+  }
 }
 
 export function clearGallery() {
-  gallery.innerHTML = '';
+  galleryContainer.innerHTML = '';
 }
 
 export function showLoader() {
-  loaderWrapper.classList.remove('hidden');
+  const loader = document.querySelector('.loader');
+  if (loader) loader.style.display = 'block';
 }
 
 export function hideLoader() {
-  loaderWrapper.classList.add('hidden');
+  const loader = document.querySelector('.loader');
+  if (loader) loader.style.display = 'none';
 }
 
 export function showLoadMoreButton() {
-  loadMoreBtn.classList.remove('hidden');
+  const btn = document.querySelector('.load-more');
+  if (btn) btn.style.display = 'block';
 }
 
 export function hideLoadMoreButton() {
-  loadMoreBtn.classList.add('hidden');
+  const btn = document.querySelector('.load-more');
+  if (btn) btn.style.display = 'none';
 }

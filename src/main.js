@@ -8,15 +8,13 @@ import {
   hideLoadMoreButton,
 } from './js/render-functions.js';
 
-import iziToast from 'izitoast';
-import 'izitoast/dist/css/iziToast.min.css';
-
 const form = document.querySelector('.form');
 const loadMoreBtn = document.querySelector('.load-more');
 
 let query = '';
 let page = 1;
 let totalHits = 0;
+const perPage = 15;
 
 form.addEventListener('submit', async event => {
   event.preventDefault();
@@ -43,11 +41,19 @@ form.addEventListener('submit', async event => {
 
     createGallery(data.hits);
 
-    if (totalHits > page * 15) {
+    if (totalHits <= perPage) {
+      hideLoadMoreButton();
+      iziToast.info({ message: 'All results have been loaded.' });
+    } else {
       showLoadMoreButton();
     }
   } catch (error) {
-    iziToast.error({ message: 'Something went wrong. Please try again.' });
+    iziToast.error({
+      title: 'Error',
+      message: 'Something went wrong.',
+      position: 'topRight',
+      timeout: 3000,
+    });
   } finally {
     hideLoader();
   }
@@ -56,35 +62,19 @@ form.addEventListener('submit', async event => {
 loadMoreBtn.addEventListener('click', async () => {
   page += 1;
   showLoader();
-  hideLoadMoreButton();
 
   try {
     const data = await getImagesByQuery(query, page);
     createGallery(data.hits);
 
-    if (page * 15 >= totalHits) {
-      iziToast.info({
-        message: "We're sorry, but you've reached the end of search results.",
-      });
-    } else {
-      showLoadMoreButton();
+    if (page * perPage >= totalHits) {
+      hideLoadMoreButton();
+      iziToast.info({ message: 'All results have been loaded.' });
     }
-
-    scrollPage();
   } catch (error) {
-    iziToast.error({ message: 'Error loading more images.' });
+    iziToast.error({ message: 'Something went wrong.' });
+    console.error(error);
   } finally {
     hideLoader();
   }
 });
-
-function scrollPage() {
-  const { height: cardHeight } = document
-    .querySelector('.gallery')
-    .firstElementChild.getBoundingClientRect();
-
-  window.scrollBy({
-    top: cardHeight * 2,
-    behavior: 'smooth',
-  });
-}
