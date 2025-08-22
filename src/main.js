@@ -61,15 +61,27 @@ form.addEventListener('submit', async event => {
 
 loadMoreBtn.addEventListener('click', async () => {
   page += 1;
+  hideLoadMoreButton();
   showLoader();
 
   try {
     const data = await getImagesByQuery(query, page);
     createGallery(data.hits);
 
+    const { height: cardHeight } = document
+      .querySelector('.gallery')
+      .firstElementChild.getBoundingClientRect();
+
+    window.scrollBy({
+      top: cardHeight * 2,
+      behavior: 'smooth',
+    });
+
     if (page * perPage >= totalHits) {
       hideLoadMoreButton();
       iziToast.info({ message: 'All results have been loaded.' });
+    } else {
+      showLoadMoreButton();
     }
   } catch (error) {
     iziToast.error({ message: 'Something went wrong.' });
